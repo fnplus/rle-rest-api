@@ -47,12 +47,29 @@ exports.add_user = (req, res) => {
 }
 
 exports.update_user_score = (req, res) => {
-    res.send('NOT IMPLEMENTED');
+    
+    const userRef = db.collection('users').where('geekID', '==', req.body.geekID);
+
+    userRef.get().then(querySnapshot => {
+        let docs = querySnapshot.docs;
+        return docs[0].ref.update({geekScore: req.body.score})
+    }).then(() => {
+        console.log('updated user score!')
+        res.send({success: true});
+    });
 
 }
 
 exports.reset_scores = (req, res) => {
 
-    res.send('NOT IMPLEMENTED');
+    const userRef = db.collection('users').where('geekID', '==', req.body.geekID);
+
+    userRef.get().then(querySnapshot => {
+        let docs = querySnapshot.docs;
+        return docs[0].ref.update({geekScore: 0})
+    }).then(() => {
+        console.log('reset user score!')
+        res.send({success: true});
+    });
 
 }
