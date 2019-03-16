@@ -4,22 +4,24 @@ const db = firebaseAdmin.firestore();
 
 exports.user_scores = (req, res) => {
 
-    res.send('NOT IMPLEMENTED');
+    const users = {};
+
+    db.collection('users').get()
+    .then((snapshot) => {
+        snapshot.forEach((doc) => {
+        console.log(doc.id, '=>', doc.data());
+        users[doc.id] = doc.data().geekScore;
+        
+    });
+    res.send(users);
+  })
+  .catch((err) => {
+    console.log('Error getting documents', err);
+  });
+  
 };
 
 exports.add_user = (req, res) => {
-
-    // var docRef = db.collection('users').doc('alovelace');
-
-    // docRef.set({
-    //   first: 'Ada',
-    //   last: 'Lovelace',
-    //   born: 1815
-    // }).then(() => {
-    //         console.log("written to database!");
-
-    //         res.send({success: "true"});
-    // });
 
     const user = {
         address: req.body.address,
