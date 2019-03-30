@@ -1,75 +1,81 @@
-
-const firebaseAdmin = require('../modules/firebase').FirebaseApp;
+const firebaseAdmin = require("../modules/firebase").FirebaseApp;
 const db = firebaseAdmin.firestore();
 
 exports.user_scores = (req, res) => {
+  const users = [];
 
-    const users = {};
+  db.collection("users")
+    .get()
+    .then(snapshot => {
+      snapshot.forEach(doc => {
+        let data = doc.data();
 
-    db.collection('users').get()
-    .then((snapshot) => {
-        snapshot.forEach((doc) => {
-        console.log(doc.id, '=>', doc.data());
-        users[doc.id] = doc.data().geekScore;
-        
+        let user = {
+          name: data.name.first + " " + data.name.last,
+          geekID: data.geekID,
+          score: data.geekScore
+        };
+
+        users.push(user);
+      });
+      res.send(users);
+    })
+    .catch(err => {
+      console.log("Error getting documents", err);
     });
-    res.send(users);
-  })
-  .catch((err) => {
-    console.log('Error getting documents', err);
-  });
-  
 };
 
 exports.add_user = (req, res) => {
+  const user = {
+    address: req.body.address,
+    dob: req.body.dob,
+    domains: req.body.domains,
+    email: req.body.email,
+    geekID: req.body.geekID,
+    geekScore: req.body.geekScore,
+    gender: req.body.gender,
+    linkedin: req.body.linkedin,
+    name: req.body.name,
+    newsletter: req.body.newsletter,
+    portfolio: req.body.portfolio,
+    projects: req.body.projects
+  };
 
-    const user = {
-        address: req.body.address,
-        dob: req.body.dob,
-        domains: req.body.domains,
-        email: req.body.email,
-        geekID: req.body.geekID,
-        geekScore: req.body.geekScore,
-        gender: req.body.gender,
-        linkedin: req.body.linkedin,
-        name: req.body.name,
-        newsletter: req.body.newsletter,
-        portfolio: req.body.portfolio,
-        projects:req.body.projects
-    }
-
-    db.collection('users').doc().set(user).then(() => {
-        console.log("Saved user to database");
-        res.send({success: "true"});
+  db.collection("users")
+    .doc()
+    .set(user)
+    .then(() => {
+      console.log("Saved user to database");
+      res.send({ success: "true" });
     });
-
-      
-}
+};
 
 exports.update_user_score = (req, res) => {
-    
-    const userRef = db.collection('users').where('geekID', '==', req.body.geekID);
+  const userRef = db.collection("users").where("geekID", "==", req.body.geekID);
 
-    userRef.get().then(querySnapshot => {
-        let docs = querySnapshot.docs;
-        return docs[0].ref.update({geekScore: req.body.score})
-    }).then(() => {
-        console.log('updated user score!')
-        res.send({success: true});
+  userRef
+    .get()
+    .then(querySnapshot => {
+      let docs = querySnapshot.docs;
+      return docs[0].ref.update({ geekScore: req.body.score });
+    })
+    .then(() => {
+      console.log("updated user score!");
+      res.send({ success: true });
     });
-
-}
+};
 
 exports.reset_scores = (req, res) => {
+  const userRef = db.collection("users").where("geekID", "==", req.body.geekID);
 
-    const userRef = db.collection('users').where('geekID', '==', req.body.geekID);
-
-    userRef.get().then(querySnapshot => {
-        let docs = querySnapshot.docs;
-        return docs[0].ref.update({geekScore: 0})
-    }).then(() => {
-        console.log('reset user score!')
-        res.send({success: true});
+  userRef
+    .get()
+    .then(querySnapshot => {
+      let docs = querySnapshot.docs;
+      return docs[0].ref.update({ geekScore: 0 });
+    })
+    .then(() => {
+      console.log("reset user score!");
+      res.send({ success: true });
     });
-
-}
+};
