@@ -16,4 +16,6 @@ router.post('/update/score', userController.update_user_score);
 
 router.post('/reset',userController.reset_scores);
 
+router.post('/activities', userController.add_activity_statement);
+
 module.exports = router;

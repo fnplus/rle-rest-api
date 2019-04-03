@@ -79,3 +79,27 @@ exports.reset_scores = (req, res) => {
       res.send({ success: true });
     });
 };
+
+exports.add_activity_statement = (req, res) => {
+
+  const activity = {}
+
+  activity.verb = req.body.verb
+  activity.version = req.body.version
+  activity.timestamp = req.body.timestamp
+  activity.object = req.body.object
+  activity.actor = req.body.actor
+  activity.stored = req.body.stored
+  activity.authority = req.body.authority
+  activity.id = req.body.id
+
+  db.collection("activities")
+    .doc()
+    .set(activity)
+    .then(() => {
+      console.log("Saved activity to database");
+      res.send({ success: "true" });
+    });
+
+  
+}
