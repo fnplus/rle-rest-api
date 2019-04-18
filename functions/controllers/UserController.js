@@ -40,6 +40,7 @@ exports.add_user = (req, res) => {
     gender: req.body.gender,
     linkedin: req.body.linkedin,
     name: req.body.name,
+    phoneNumber: req.body.phoneNumber,
     newsletter: req.body.newsletter,
     portfolio: req.body.portfolio,
     projects: req.body.projects
@@ -52,6 +53,52 @@ exports.add_user = (req, res) => {
       console.log("Saved user to database");
       res.send({ success: "true" });
     });
+};
+
+exports.add_users = (req, res) => {
+  let batch = db.batch();
+  let userRef = db.collection("users").doc();
+
+  let geeks = req.body.map(geek => ({
+    address: {
+      city: geek["City"],
+      state: geek["Select Province / Territory"]
+    },
+    dob: geek["When should we wish you Happy Birthday?"],
+    domains: geek[
+      "What technologies are you looking to work on in near future?"
+    ].split(","),
+    email: geek["Email"],
+    geekID: geek["Geek ID"],
+    geekScore: geek["Geek Score"],
+    gender: geek["Gender"],
+    linkedin: geek["Linkedin"],
+    name: {
+      first: geek["First Name"],
+      last: geek["Last Name"]
+    },
+    phoneNumber: geek["Phone Number"],
+    newsletter:
+      geek[
+        "Would you like to receive periodic emails on news, product updates and special offers from our Partners?"
+      ] === "Yes"
+        ? true
+        : false,
+    portfolio: geek["Portfolio"],
+    projects:
+      geek[
+        "Are you proud of any of your project(s)? What was the most challenging thing in it?"
+      ]
+  }));
+
+  for (const geek of geeks) {
+    batch.set(db.collection("users").doc(), geek);
+  }
+
+  batch.commit().then(() => {
+    console.log("Saved user to database");
+    res.send({ success: "true" });
+  });
 };
 
 exports.update_user_score = (req, res) => {
